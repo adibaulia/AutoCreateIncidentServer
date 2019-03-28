@@ -11,4 +11,4 @@
 |
 */
 
-$router->get('/', 'ActionController@run');
+$router->post('/run', 'ActionController@run');

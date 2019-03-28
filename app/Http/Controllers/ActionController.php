@@ -24,33 +24,21 @@ class ActionController extends Controller
 
     public function run(Request $req)
     {
-        
-        Redis::set($req->name,$req->name);
-        $redis= Redis::get($req->name);
-        // $this->extractData($req);
+        $data = $this->extractData($req);
 
-        // $incident = new IncidentController('');
-        
+        $incident = new IncidentController($data);
+        $incident->create();
+        //dd($data);
+     
 
-         return response()->json($redis);
+
+        return response()->json(['Status' => 'Success. check iTop']);
     }
 
     public function test(Request $req)
     {
-        // $c = $req->cmd==''?'dir':$req->cmd;
-
-        // system($c, $retval);
-        // echo $retval;
-
-        $host = '192.168.56.23';
-        $port = '22';
-        $username = 'root';
-        $password = '123';
-
-        //echo $this->restartServer($host, $username, $password);
-        echo "test";
-        dd($req);
-
+      
+        
     }
     
     public function runScript()
@@ -65,7 +53,7 @@ class ActionController extends Controller
 
 
 
-    public function extractData(Request $req)
+    public function extractData(Request $data)
     {
         /*
         data parameter that required this app from PRTG
@@ -91,10 +79,12 @@ class ActionController extends Controller
 
        //$comment, $org_id, $agent_id, $origin, $title, $desc, $impact, $urgency, $service_id, $servicesubcategory_id, $public_log, $event_id
 
+        $data->service_id= "1";
+        $data->servicesubcategory_id= "304";
+        
 
-
-        $data = $req;
-        return $req;
+        
+        return $data;
     }
 
     public function check_condition()
@@ -108,7 +98,7 @@ class ActionController extends Controller
                return response()->json(['Message' => 'fill the name first']);
         } else
 
-            $user = new User();
+        $user = new User();
         $user->name = $req->name;
         $token= Str::random(30);
         $user->token = $token;

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+
 class IncidentController extends Controller
 {
     /**
@@ -10,11 +12,11 @@ class IncidentController extends Controller
      * @return void
      */
     var $data;
-    public function __construct($prtg_data)
+    public function __construct(Request $input_data)
     {
         $this->middleware('auth');
         global $data;
-        $data=$prtg_data;
+        $data= $input_data;
     }
 
     public function show(){
@@ -22,22 +24,27 @@ class IncidentController extends Controller
         return $data;
     }
 
-    public function testCreate()
+    public function create()
     {
         global $data;
-        echo "oke";
-        $comment = "Changes Call from other Apps";
+        // /dd($data->service_id);
+        $comment = "REPORTER BOT";
         $org_id = "2";
-        $origin = "phone";
-        $title = "Incident Ticket Server Test";
-        $desc = "BLABLALABALBAL test";
+        $origin = "monitoring";
+        $title = strtoupper($data->message." Ip Server = ".$data->host);
+        $desc = $data->message." Ip Server = ".$data->host." ".$data->device.
+                " ".$data->name." ".$data->status." ".$data->down." ".
+                "This desc created by REPORTERBOT";
         $impact = "2";
         $urgency = "1";
-        $service_id = "1";
-        $servicesubcategory_id = "304";
-        $public_log = "This is public log";
-        $event_id = "E123";
-        $this->createIncident($comment, $org_id, $origin, $title, $desc, $impact, $urgency, $service_id, $servicesubcategory_id, $public_log, $event_id);
+        $service_id = $data->service_id;
+        $servicesubcategory_id = $data->servicesubcategory_id;
+        $public_log = "MENCOBA";
+        $event_id = "I".$data->service_id.$data->host;
+        $incident_category= "operational";
+        $incident_subcategory= "server";
+        $this->createTicket($comment, $org_id, $origin, $title, $desc, $impact, $urgency, $service_id, 
+        $servicesubcategory_id, $public_log, $event_id, $incident_category, $incident_subcategory);
     }
 
     public function getDescData()
@@ -46,8 +53,8 @@ class IncidentController extends Controller
     }
 
 
-    public function createTicket($comment, $org_id, $agent_id, $origin, $title, $desc, $impact,
-                                    $urgency, $service_id, $servicesubcategory_id, $public_log, $event_id)
+    public function createTicket($comment, $org_id, $origin, $title, $desc, $impact, $urgency, 
+            $service_id, $servicesubcategory_id, $public_log, $event_id, $incident_category, $incident_subcategory)
     {
                     $json_data = '{
                     "operation": "core/create",
@@ -57,20 +64,18 @@ class IncidentController extends Controller
                     "fields": {
                         "org_id": "'.$org_id.'",
                         "caller_id": "5417",
-                        "agent_id": '.$agent_id.'
                         "origin": "'.$origin.'",
-                        "title": "'.$title." ".$event_id.'",
+                        "title": "'.$title."     ".$event_id.'",
                         "description": "'.$desc.'",
                         "impact": "'.$impact.'",
                         "urgency": "'.$urgency.'",
                         "service_id": "'.$service_id.'",
                         "servicesubcategory_id": "'.$servicesubcategory_id.'",
-                        "public_log": "'.$public_log.'"
+                        "public_log": "'.$public_log. '"
                         }
                     }
                     ';
         return $this->callApi($json_data);
-
     }
 
     public function getTicket($event_id)
@@ -113,7 +118,7 @@ class IncidentController extends Controller
 		$HELPDESK_API_VERSION = "1.3";
 		$HELPDESK_USER = "autocreateincidentbot";
 		$HELPDESK_PASSWORD = "qwerty12345";
-
+       // dd($json_data);
 		$payload = array(
 			'auth_user' => $HELPDESK_USER,
 			'auth_pwd' => $HELPDESK_PASSWORD,

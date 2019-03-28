@@ -12,16 +12,21 @@ class ScripSolverController extends Controller
     public function __construct($prtg_data)
     {
         $this->middleware('auth');
+        
+
     }
 
     public function initialCheck()
     {
-
+        $HOST = '192.168.56.23';
+        $PORT = '22';
+        $USERNAME = 'root';
+        $PASSWORD = '123';
     }
 
     public function checkKB()
     {
-
+        
     }
 
     public function restartServer($host, $username, $password)
